@@ -31,7 +31,7 @@ int main(int, char**) {
 #endif
 
     // Create window
-    GLFWwindow* window = glfwCreateWindow(800, 700, "Color Value Finder", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(900, 750, "Color Value Finder", nullptr, nullptr);
     if (window == nullptr)
         return 1;
     glfwMakeContextCurrent(window);
@@ -85,10 +85,17 @@ int main(int, char**) {
         ImGui::Separator();
         ImGui::Spacing();
 
+        // Create two columns for better layout
+        ImGui::Columns(2, "mainColumns", false);
+        ImGui::SetColumnWidth(0, 500);
+
+        // Left column - Sliders and inputs
+        ImGui::BeginChild("LeftPanel", ImVec2(0, 0), false);
+
         // Color preview
         ImGui::Text("Color Preview:");
         ImGui::ColorButton("##preview", ImVec4(currentRGB.r, currentRGB.g, currentRGB.b, 1.0f), 
-            ImGuiColorEditFlags_NoAlpha, ImVec2(200, 100));
+            ImGuiColorEditFlags_NoAlpha, ImVec2(150, 80));
         
         ImGui::Spacing();
         ImGui::Separator();
@@ -97,6 +104,7 @@ int main(int, char**) {
         // HEX Input
         ImGui::Text("HEX:");
         ImGui::SameLine();
+        ImGui::SetNextItemWidth(150);
         if (ImGui::InputText("##hex", hexInput, sizeof(hexInput), ImGuiInputTextFlags_CharsUppercase)) {
             syncFromHex = true;
         }
@@ -107,12 +115,15 @@ int main(int, char**) {
 
         // RGB Sliders
         ImGui::Text("RGB (0-255):");
+        ImGui::SetNextItemWidth(300);
         if (ImGui::SliderFloat("R##rgb", &rgbInput[0], 0.0f, 255.0f, "%.0f")) {
             syncFromRGB = true;
         }
+        ImGui::SetNextItemWidth(300);
         if (ImGui::SliderFloat("G##rgb", &rgbInput[1], 0.0f, 255.0f, "%.0f")) {
             syncFromRGB = true;
         }
+        ImGui::SetNextItemWidth(300);
         if (ImGui::SliderFloat("B##rgb", &rgbInput[2], 0.0f, 255.0f, "%.0f")) {
             syncFromRGB = true;
         }
@@ -123,12 +134,15 @@ int main(int, char**) {
 
         // HSV Sliders
         ImGui::Text("HSV:");
+        ImGui::SetNextItemWidth(300);
         if (ImGui::SliderFloat("H##hsv", &hsvInput[0], 0.0f, 360.0f, "%.0f°")) {
             syncFromHSV = true;
         }
+        ImGui::SetNextItemWidth(300);
         if (ImGui::SliderFloat("S##hsv", &hsvInput[1], 0.0f, 1.0f, "%.2f")) {
             syncFromHSV = true;
         }
+        ImGui::SetNextItemWidth(300);
         if (ImGui::SliderFloat("V##hsv", &hsvInput[2], 0.0f, 1.0f, "%.2f")) {
             syncFromHSV = true;
         }
@@ -139,12 +153,15 @@ int main(int, char**) {
 
         // HSL Sliders
         ImGui::Text("HSL:");
+        ImGui::SetNextItemWidth(300);
         if (ImGui::SliderFloat("H##hsl", &hslInput[0], 0.0f, 360.0f, "%.0f°")) {
             syncFromHSL = true;
         }
+        ImGui::SetNextItemWidth(300);
         if (ImGui::SliderFloat("S##hsl", &hslInput[1], 0.0f, 1.0f, "%.2f")) {
             syncFromHSL = true;
         }
+        ImGui::SetNextItemWidth(300);
         if (ImGui::SliderFloat("L##hsl", &hslInput[2], 0.0f, 1.0f, "%.2f")) {
             syncFromHSL = true;
         }
@@ -155,25 +172,31 @@ int main(int, char**) {
 
         // CMYK Sliders
         ImGui::Text("CMYK (0-100):");
+        ImGui::SetNextItemWidth(300);
         if (ImGui::SliderFloat("C##cmyk", &cmykInput[0], 0.0f, 1.0f, "%.2f")) {
             syncFromCMYK = true;
         }
+        ImGui::SetNextItemWidth(300);
         if (ImGui::SliderFloat("M##cmyk", &cmykInput[1], 0.0f, 1.0f, "%.2f")) {
             syncFromCMYK = true;
         }
+        ImGui::SetNextItemWidth(300);
         if (ImGui::SliderFloat("Y##cmyk", &cmykInput[2], 0.0f, 1.0f, "%.2f")) {
             syncFromCMYK = true;
         }
+        ImGui::SetNextItemWidth(300);
         if (ImGui::SliderFloat("K##cmyk", &cmykInput[3], 0.0f, 1.0f, "%.2f")) {
             syncFromCMYK = true;
         }
 
-        ImGui::Spacing();
-        ImGui::Separator();
-        ImGui::Spacing();
+        ImGui::EndChild();
 
-        // Color Picker
+        // Right column - Color Picker
+        ImGui::NextColumn();
+        
+        ImGui::BeginChild("RightPanel", ImVec2(0, 0), false);
         ImGui::Text("Color Picker:");
+        ImGui::Spacing();
         float pickerColor[3] = {currentRGB.r, currentRGB.g, currentRGB.b};
         if (ImGui::ColorPicker3("##picker", pickerColor, 
             ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_NoAlpha | 
@@ -186,6 +209,9 @@ int main(int, char**) {
             rgbInput[1] = currentRGB.g * 255.0f;
             rgbInput[2] = currentRGB.b * 255.0f;
         }
+        ImGui::EndChild();
+
+        ImGui::Columns(1);
 
         // Synchronization logic
         if (syncFromHex) {
