@@ -149,11 +149,7 @@ int main(int, char**) {
         // Left column - Sliders and inputs
         ImGui::BeginChild("LeftPanel", ImVec2(0, 0), false);
 
-        // Color preview
-        ImGui::Text("Color Preview:");
-        ImGui::ColorButton("##preview", ImVec4(currentRGB.r, currentRGB.g, currentRGB.b, 1.0f), 
-            ImGuiColorEditFlags_NoAlpha, ImVec2(150, 80));
-        
+        // Removed preview here; moved below the picker on the right
         ImGui::Spacing();
         ImGui::Separator();
         ImGui::Spacing();
@@ -266,6 +262,28 @@ int main(int, char**) {
             rgbInput[1] = currentRGB.g * 255.0f;
             rgbInput[2] = currentRGB.b * 255.0f;
         }
+        ImGui::Spacing();
+        ImGui::Separator();
+        ImGui::Spacing();
+        ImGui::Text("Color Preview:");
+        // Full-width preview with subtle border and shadow
+        float previewWidth = ImGui::GetContentRegionAvail().x;
+        float previewHeight = 120.0f;
+        ImVec2 cursor = ImGui::GetCursorScreenPos();
+        ImVec2 pMin = ImVec2(cursor.x, cursor.y);
+        ImVec2 pMax = ImVec2(cursor.x + previewWidth, cursor.y + previewHeight);
+        ImDrawList* dl = ImGui::GetWindowDrawList();
+        float rounding = ImGui::GetStyle().FrameRounding;
+        ImU32 colShadow = ImGui::GetColorU32(ImVec4(0, 0, 0, 0.35f));
+        ImU32 colBorder = ImGui::GetColorU32(ImVec4(0.28f, 0.32f, 0.45f, 0.8f));
+        ImU32 colFill = ImGui::GetColorU32(ImVec4(currentRGB.r, currentRGB.g, currentRGB.b, 1.0f));
+        // Shadow (slight offset)
+        dl->AddRectFilled(ImVec2(pMin.x + 4, pMin.y + 6), ImVec2(pMax.x + 4, pMax.y + 6), colShadow, rounding);
+        // Filled rectangle with border
+        dl->AddRectFilled(pMin, pMax, colFill, rounding);
+        dl->AddRect(pMin, pMax, colBorder, rounding, 0.0f, 2.0f);
+        // Reserve layout space
+        ImGui::InvisibleButton("##preview_swatch", ImVec2(previewWidth, previewHeight));
         ImGui::EndChild();
 
         ImGui::Columns(1);
