@@ -2,8 +2,6 @@
 
 A cross-platform GUI application for finding and converting color values between different color formats. Built with C++, Dear ImGui, and GLFW.
 
-![Color Value Finder](screenshot.png)
-
 ## Features
 
 - **Visual Color Preview**: See your selected color in real-time
@@ -58,7 +56,7 @@ sudo pacman -S base-devel cmake mesa libxrandr libxinerama libxcursor libxi
 
 ```powershell
 # Clone the repository
-git clone <repository-url>
+git clone [<repository-url>](https://github.com/mattanmr/color_value_finder.git)
 cd color_value_finder
 
 # Create build directory
@@ -89,7 +87,7 @@ cmake --build . --config Release
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone [<repository-url>](https://github.com/mattanmr/color_value_finder.git)
 cd color_value_finder
 
 # Create build directory
@@ -110,7 +108,7 @@ cmake --build . --config Release
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone [<repository-url>](https://github.com/mattanmr/color_value_finder.git)
 cd color_value_finder
 
 # Create build directory
