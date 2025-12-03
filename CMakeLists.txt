@@ -52,12 +52,15 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 if(WIN32)
     # Nothing specific needed for now
 elseif(APPLE)
+    # Add Objective-C++ shim for macOS 15+ ScreenCaptureKit
+    target_sources(${PROJECT_NAME} PRIVATE src/PlatformUtils_mac.mm)
     target_link_libraries(${PROJECT_NAME} PRIVATE
         "-framework Cocoa"
         "-framework IOKit"
         "-framework CoreVideo"
         "-framework CoreGraphics"
         "-framework ApplicationServices"
+        "-framework ScreenCaptureKit"
     )
 elseif(UNIX)
     target_link_libraries(${PROJECT_NAME} PRIVATE

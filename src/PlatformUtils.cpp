@@ -72,8 +72,9 @@ namespace PlatformUtils {
             r = g = b = 0.0f;
         }
 #else
-    // On macOS 15+, ScreenCaptureKit is required. Fallback to zeros for now.
-    r = g = b = 0.0f;
+    // On macOS 15+, defer to ScreenCaptureKit shim in Objective-C++ file.
+    extern void GetPixelColor_SC(int x, int y, float& r, float& g, float& b);
+    GetPixelColor_SC(x, y, r, g, b);
 #endif
     }
     
