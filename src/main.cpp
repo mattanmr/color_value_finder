@@ -110,11 +110,13 @@ int main(int, char**) {
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
-    // Application state - initialize from default color #4CC2CC
-    char hexInput[8] = "#4CC2CC";
-    RGB currentRGB = ColorConverter::HexToRGB(std::string(hexInput));
+    // Application state - initialize from default color #4CC2CCFF (with alpha)
+    char hexInput[10] = "#4CC2CCFF";
+    RGBA currentRGBA = ColorConverter::HexToRGBA(std::string(hexInput));
+    RGB currentRGB = RGB(currentRGBA.r, currentRGBA.g, currentRGBA.b);
     
     float rgbInput[3] = { currentRGB.r * 255.0f, currentRGB.g * 255.0f, currentRGB.b * 255.0f };
+    float alphaInput = currentRGBA.a;
     HSV initHSV = ColorConverter::RGBToHSV(currentRGB);
     HSL initHSL = ColorConverter::RGBToHSL(currentRGB);
     CMYK initCMYK = ColorConverter::RGBToCMYK(currentRGB);
@@ -159,10 +161,10 @@ int main(int, char**) {
         ImGui::Separator();
         ImGui::Spacing();
 
-        // HEX Input
+        // HEX Input (supports #RRGGBB and #RRGGBBAA)
         ImGui::Text("HEX:");
         ImGui::SameLine();
-        ImGui::SetNextItemWidth(150);
+        ImGui::SetNextItemWidth(180);
         if (ImGui::InputText("##hex", hexInput, sizeof(hexInput), ImGuiInputTextFlags_CharsUppercase)) {
             syncFromHex = true;
         }
@@ -185,6 +187,10 @@ int main(int, char**) {
         if (ImGui::SliderFloat("B##rgb", &rgbInput[2], 0.0f, 255.0f, "%.0f")) {
             syncFromRGB = true;
         }
+
+        // Alpha slider
+        ImGui::SetNextItemWidth(300);
+        ImGui::SliderFloat("A (alpha)", &alphaInput, 0.0f, 1.0f, "%.2f");
 
         ImGui::Spacing();
         ImGui::Separator();
@@ -255,13 +261,15 @@ int main(int, char**) {
         ImGui::BeginChild("RightPanel", ImVec2(0, 0), false);
         ImGui::Text("Color Picker:");
         ImGui::Spacing();
-        float pickerColor[3] = {currentRGB.r, currentRGB.g, currentRGB.b};
-        if (ImGui::ColorPicker3("##picker", pickerColor, 
-            ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_NoAlpha | 
-            ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_DisplayHSV)) {
+        float pickerColor[4] = {currentRGB.r, currentRGB.g, currentRGB.b, alphaInput};
+        if (ImGui::ColorPicker4("##picker", pickerColor,
+            ImGuiColorEditFlags_PickerHueWheel |
+            ImGuiColorEditFlags_DisplayRGB |
+            ImGuiColorEditFlags_DisplayHSV)) {
             currentRGB.r = pickerColor[0];
             currentRGB.g = pickerColor[1];
             currentRGB.b = pickerColor[2];
+            alphaInput   = pickerColor[3];
             syncFromRGB = true;
             rgbInput[0] = currentRGB.r * 255.0f;
             rgbInput[1] = currentRGB.g * 255.0f;
@@ -281,7 +289,22 @@ int main(int, char**) {
         float rounding = ImGui::GetStyle().FrameRounding;
         ImU32 colShadow = ImGui::GetColorU32(ImVec4(0, 0, 0, 0.35f));
         ImU32 colBorder = ImGui::GetColorU32(ImVec4(0.28f, 0.32f, 0.45f, 0.8f));
-        ImU32 colFill = ImGui::GetColorU32(ImVec4(currentRGB.r, currentRGB.g, currentRGB.b, 1.0f));
+        ImU32 colFill = ImGui::GetColorU32(ImVec4(currentRGB.r, currentRGB.g, currentRGB.b, alphaInput));
+        
+        // Checkerboard background to visualize transparency
+        const float tileSize = 12.0f;
+        ImU32 colLight = ImGui::GetColorU32(ImVec4(0.75f, 0.75f, 0.75f, 1.0f));
+        ImU32 colDark  = ImGui::GetColorU32(ImVec4(0.55f, 0.55f, 0.55f, 1.0f));
+        int tilesX = (int)ceilf((pMax.x - pMin.x) / tileSize);
+        int tilesY = (int)ceilf((pMax.y - pMin.y) / tileSize);
+        for (int y = 0; y < tilesY; ++y) {
+            for (int x = 0; x < tilesX; ++x) {
+                bool isLight = ((x + y) % 2) == 0;
+                ImVec2 cMin(pMin.x + x * tileSize, pMin.y + y * tileSize);
+                ImVec2 cMax(std::min(cMin.x + tileSize, pMax.x), std::min(cMin.y + tileSize, pMax.y));
+                dl->AddRectFilled(cMin, cMax, isLight ? colLight : colDark, rounding);
+            }
+        }
         // Shadow (slight offset)
         dl->AddRectFilled(ImVec2(pMin.x + 4, pMin.y + 6), ImVec2(pMax.x + 4, pMax.y + 6), colShadow, rounding);
         // Filled rectangle with border
@@ -289,13 +312,33 @@ int main(int, char**) {
         dl->AddRect(pMin, pMax, colBorder, rounding, 0.0f, 2.0f);
         // Reserve layout space
         ImGui::InvisibleButton("##preview_swatch", ImVec2(previewWidth, previewHeight));
+        
+        // RGBA and HEX display + copy buttons
+        ImGui::Spacing();
+        char rgbaText[64];
+        snprintf(rgbaText, sizeof(rgbaText), "rgba(%d, %d, %d, %.2f)",
+                 (int)(currentRGB.r * 255.0f), (int)(currentRGB.g * 255.0f), (int)(currentRGB.b * 255.0f), alphaInput);
+        ImGui::Text("%s", rgbaText);
+        ImGui::SameLine();
+        if (ImGui::Button("Copy RGBA")) {
+            ImGui::SetClipboardText(rgbaText);
+        }
+        ImGui::SameLine();
+        std::string hexCpy = ColorConverter::RGBAToHex(RGBA(currentRGB.r, currentRGB.g, currentRGB.b, alphaInput));
+        ImGui::Text("%s", hexCpy.c_str());
+        ImGui::SameLine();
+        if (ImGui::Button("Copy HEX")) {
+            ImGui::SetClipboardText(hexCpy.c_str());
+        }
         ImGui::EndChild();
 
         ImGui::Columns(1);
 
         // Synchronization logic
         if (syncFromHex) {
-            currentRGB = ColorConverter::HexToRGB(std::string(hexInput));
+            currentRGBA = ColorConverter::HexToRGBA(std::string(hexInput));
+            currentRGB = RGB(currentRGBA.r, currentRGBA.g, currentRGBA.b);
+            alphaInput = currentRGBA.a;
             rgbInput[0] = currentRGB.r * 255.0f;
             rgbInput[1] = currentRGB.g * 255.0f;
             rgbInput[2] = currentRGB.b * 255.0f;
@@ -324,7 +367,7 @@ int main(int, char**) {
             currentRGB.g = rgbInput[1] / 255.0f;
             currentRGB.b = rgbInput[2] / 255.0f;
             
-            std::string hex = ColorConverter::RGBToHex(currentRGB);
+            std::string hex = ColorConverter::RGBAToHex(RGBA(currentRGB.r, currentRGB.g, currentRGB.b, alphaInput));
             strncpy(hexInput, hex.c_str(), sizeof(hexInput) - 1);
             hexInput[sizeof(hexInput) - 1] = '\0';
             
@@ -355,7 +398,7 @@ int main(int, char**) {
             rgbInput[1] = currentRGB.g * 255.0f;
             rgbInput[2] = currentRGB.b * 255.0f;
             
-            std::string hex = ColorConverter::RGBToHex(currentRGB);
+            std::string hex = ColorConverter::RGBAToHex(RGBA(currentRGB.r, currentRGB.g, currentRGB.b, alphaInput));
             strncpy(hexInput, hex.c_str(), sizeof(hexInput) - 1);
             hexInput[sizeof(hexInput) - 1] = '\0';
             
@@ -381,7 +424,7 @@ int main(int, char**) {
             rgbInput[1] = currentRGB.g * 255.0f;
             rgbInput[2] = currentRGB.b * 255.0f;
             
-            std::string hex = ColorConverter::RGBToHex(currentRGB);
+            std::string hex = ColorConverter::RGBAToHex(RGBA(currentRGB.r, currentRGB.g, currentRGB.b, alphaInput));
             strncpy(hexInput, hex.c_str(), sizeof(hexInput) - 1);
             hexInput[sizeof(hexInput) - 1] = '\0';
             

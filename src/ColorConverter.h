@@ -13,6 +13,11 @@ struct RGB {
     RGB(float r = 0.0f, float g = 0.0f, float b = 0.0f) : r(r), g(g), b(b) {}
 };
 
+struct RGBA {
+    float r, g, b, a; // 0.0 to 1.0
+    RGBA(float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 1.0f) : r(r), g(g), b(b), a(a) {}
+};
+
 struct HSV {
     float h, s, v; // h: 0-360, s: 0-1, v: 0-1
     HSV(float h = 0.0f, float s = 0.0f, float v = 0.0f) : h(h), s(s), v(v) {}
@@ -33,6 +38,9 @@ public:
     // RGB conversions
     static std::string RGBToHex(const RGB& rgb);
     static RGB HexToRGB(const std::string& hex);
+    // RGBA conversions (hex with alpha #RRGGBBAA)
+    static std::string RGBAToHex(const RGBA& rgba);
+    static RGBA HexToRGBA(const std::string& hex);
     
     static HSV RGBToHSV(const RGB& rgb);
     static RGB HSVToRGB(const HSV& hsv);

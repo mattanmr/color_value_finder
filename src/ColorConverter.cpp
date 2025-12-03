@@ -36,6 +36,43 @@ RGB ColorConverter::HexToRGB(const std::string& hex) {
     return RGB(r / 255.0f, g / 255.0f, b / 255.0f);
 }
 
+// RGBA to HEX (#RRGGBBAA)
+std::string ColorConverter::RGBAToHex(const RGBA& rgba) {
+    int r = static_cast<int>(Clamp(rgba.r) * 255);
+    int g = static_cast<int>(Clamp(rgba.g) * 255);
+    int b = static_cast<int>(Clamp(rgba.b) * 255);
+    int a = static_cast<int>(Clamp(rgba.a) * 255);
+    std::stringstream ss;
+    ss << "#"
+       << std::hex << std::setfill('0') << std::setw(2) << r
+       << std::hex << std::setfill('0') << std::setw(2) << g
+       << std::hex << std::setfill('0') << std::setw(2) << b
+       << std::hex << std::setfill('0') << std::setw(2) << a;
+    std::string result = ss.str();
+    std::transform(result.begin(), result.end(), result.begin(), ::toupper);
+    return result;
+}
+
+// HEX (#RRGGBBAA or #RRGGBB) to RGBA
+RGBA ColorConverter::HexToRGBA(const std::string& hex) {
+    std::string cleanHex = hex;
+    if (!cleanHex.empty() && cleanHex[0] == '#') {
+        cleanHex = cleanHex.substr(1);
+    }
+    if (cleanHex.length() == 6) {
+        RGB rgb = HexToRGB("#" + cleanHex);
+        return RGBA(rgb.r, rgb.g, rgb.b, 1.0f);
+    }
+    if (cleanHex.length() != 8) {
+        return RGBA(0, 0, 0, 1.0f);
+    }
+    int r = HexCharToInt(cleanHex[0]) * 16 + HexCharToInt(cleanHex[1]);
+    int g = HexCharToInt(cleanHex[2]) * 16 + HexCharToInt(cleanHex[3]);
+    int b = HexCharToInt(cleanHex[4]) * 16 + HexCharToInt(cleanHex[5]);
+    int a = HexCharToInt(cleanHex[6]) * 16 + HexCharToInt(cleanHex[7]);
+    return RGBA(r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f);
+}
+
 // RGB to HSV
 HSV ColorConverter::RGBToHSV(const RGB& rgb) {
     float r = Clamp(rgb.r);
