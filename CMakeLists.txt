@@ -56,6 +56,8 @@ elseif(APPLE)
     target_sources(${PROJECT_NAME} PRIVATE src/PlatformUtils_mac.mm)
     target_link_libraries(${PROJECT_NAME} PRIVATE
         "-framework Cocoa"
+        "-framework CoreMedia"
+        "-framework CoreVideo"
         "-framework IOKit"
         "-framework CoreVideo"
         "-framework CoreGraphics"
