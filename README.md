@@ -149,8 +149,7 @@ cmake --build . --config Release
 1. Click the **Start** button in the Eyedropper section
 2. Move your cursor anywhere on your screen (works outside the app window)
 3. The color under your cursor will update in real-time
-4. **Left-click** to select and lock the color
-5. Press **Escape** to cancel without selecting
+4. **Escape** to select the color and stop updating
 
 ## Project Structure
 
