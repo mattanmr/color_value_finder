@@ -38,6 +38,7 @@ namespace PlatformUtils {
 #elif defined(__APPLE__)
 #include <ApplicationServices/ApplicationServices.h>
 #include <CoreGraphics/CoreGraphics.h>
+#include <AvailabilityMacros.h>
 
 namespace PlatformUtils {
     void GetCursorPosition(int& x, int& y) {
@@ -49,33 +50,32 @@ namespace PlatformUtils {
     }
     
     void GetPixelColor(int x, int y, float& r, float& g, float& b) {
-        // Create a 1x1 pixel image at the cursor location
+#if __MAC_OS_X_VERSION_MAX_ALLOWED < 150000
+        // Use legacy CoreGraphics API on macOS SDKs < 15
         CGImageRef image = CGDisplayCreateImageForRect(CGMainDisplayID(), CGRectMake(x, y, 1, 1));
-        
         if (image) {
-            // Get pixel data
             CFDataRef data = CGDataProviderCopyData(CGImageGetDataProvider(image));
             const uint8_t* pixels = CFDataGetBytePtr(data);
-            
-            // macOS typically uses BGRA or RGBA format
-            // Check bytes per pixel to determine format
             size_t bitsPerPixel = CGImageGetBitsPerPixel(image);
             size_t bytesPerPixel = bitsPerPixel / 8;
-            
-            if (bytesPerPixel >= 3) {
-                // Assume BGRA or RGBA - most common on macOS
-                r = pixels[0] / 255.0f;
+            if (pixels && bytesPerPixel >= 3) {
+                // Common macOS bitmap is BGRA; map accordingly
+                b = pixels[0] / 255.0f;
                 g = pixels[1] / 255.0f;
-                b = pixels[2] / 255.0f;
+                r = pixels[2] / 255.0f;
             } else {
                 r = g = b = 0.0f;
             }
-            
             CFRelease(data);
             CGImageRelease(image);
         } else {
             r = g = b = 0.0f;
         }
+#else
+        // On macOS 15+, ScreenCaptureKit is required; provide a safe fallback build-wise.
+        // TODO: Implement ScreenCaptureKit-based pixel sampling.
+        r = g = b = 0.0f;
+#endif
     }
     
     bool IsLeftMouseButtonPressed() {
