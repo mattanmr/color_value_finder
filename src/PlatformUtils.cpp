@@ -72,9 +72,8 @@ namespace PlatformUtils {
             r = g = b = 0.0f;
         }
 #else
-        // On macOS 15+, ScreenCaptureKit is required; provide a safe fallback build-wise.
-        // TODO: Implement ScreenCaptureKit-based pixel sampling.
-        r = g = b = 0.0f;
+    // On macOS 15+, ScreenCaptureKit is required. Fallback to zeros for now.
+    r = g = b = 0.0f;
 #endif
     }
     
