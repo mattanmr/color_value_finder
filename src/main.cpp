@@ -2,16 +2,9 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "ColorConverter.h"
+#include "PlatformUtils.h"
 
 #include <GLFW/glfw3.h>
-#ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
-#define NOMINMAX
-#include <windows.h>
-#ifdef RGB
-#undef RGB
-#endif
-#endif
 #include <cstdio>
 #include <cstring>
 
@@ -365,43 +358,42 @@ int main(int, char**) {
 
         // Synchronization logic
         
-        // Eyedropper sampling: get cursor pixel from the desktop
-        #ifdef _WIN32
+        // Eyedropper sampling: get cursor pixel from the desktop (cross-platform)
         if (eyedropperActive) {
-            POINT pt; GetCursorPos(&pt);
-            HDC hdc = GetDC(NULL);
-            if (hdc) {
-                COLORREF c = GetPixel(hdc, pt.x, pt.y);
-                ReleaseDC(NULL, hdc);
-                float r = ((c) & 0xFF) / 255.0f;
-                float g = ((c >> 8) & 0xFF) / 255.0f;
-                float b = ((c >> 16) & 0xFF) / 255.0f;
-                if (eyedropperLiveUpdate) {
-                    currentRGB.r = r; currentRGB.g = g; currentRGB.b = b;
-                    rgbInput[0] = currentRGB.r * 255.0f;
-                    rgbInput[1] = currentRGB.g * 255.0f;
-                    rgbInput[2] = currentRGB.b * 255.0f;
-                    syncFromRGB = true;
-                }
+            int x, y;
+            PlatformUtils::GetCursorPosition(x, y);
+            
+            float r, g, b;
+            PlatformUtils::GetPixelColor(x, y, r, g, b);
+            
+            if (eyedropperLiveUpdate) {
+                currentRGB.r = r;
+                currentRGB.g = g;
+                currentRGB.b = b;
+                rgbInput[0] = currentRGB.r * 255.0f;
+                rgbInput[1] = currentRGB.g * 255.0f;
+                rgbInput[2] = currentRGB.b * 255.0f;
+                syncFromRGB = true;
             }
+            
             // Confirm on left-click
-            SHORT lb = GetAsyncKeyState(VK_LBUTTON);
-            if ((lb & 0x8000) != 0) {
+            if (PlatformUtils::IsLeftMouseButtonPressed()) {
                 // Lock current sampled color and stop
                 eyedropperActive = false;
                 syncFromRGB = true;
             }
+            
             // Cancel on ESC
-            if (GetAsyncKeyState(VK_ESCAPE) & 0x8000) {
+            if (PlatformUtils::IsEscapeKeyPressed()) {
                 eyedropperActive = false;
             }
+            
             // Small on-screen tooltip near cursor inside app window
             ImGui::BeginTooltip();
             ImGui::Text("Sampling at cursor: RGB(%d,%d,%d)",
                 (int)(currentRGB.r * 255.0f), (int)(currentRGB.g * 255.0f), (int)(currentRGB.b * 255.0f));
             ImGui::EndTooltip();
         }
-        #endif
 
         if (syncFromHex) {
             currentRGBA = ColorConverter::HexToRGBA(std::string(hexInput));
