@@ -2,6 +2,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "ColorConverter.h"
+#include "PlatformUtils.h"
 
 #include <GLFW/glfw3.h>
 #include <cstdio>
@@ -129,6 +130,10 @@ int main(int, char**) {
     bool syncFromHSV = false;
     bool syncFromHSL = false;
     bool syncFromCMYK = false;
+
+    // Eyedropper state
+    bool eyedropperActive = false;
+    bool eyedropperLiveUpdate = true; // update color continuously while active
 
     // Main loop
     while (!glfwWindowShouldClose(window)) {
@@ -275,6 +280,23 @@ int main(int, char**) {
             rgbInput[1] = currentRGB.g * 255.0f;
             rgbInput[2] = currentRGB.b * 255.0f;
         }
+
+        // Eyedropper controls (pick colors from anywhere on screen)
+        ImGui::Separator();
+        ImGui::Spacing();
+        ImGui::Text("Eyedropper:");
+        ImGui::SameLine();
+        if (!eyedropperActive) {
+            if (ImGui::Button("Start")) {
+                eyedropperActive = true;
+            }
+        } else {
+            if (ImGui::Button("Stop")) {
+                eyedropperActive = false;
+            }
+            ImGui::SameLine();
+            ImGui::Text("Press Esc to stop");
+        }
         ImGui::Spacing();
         ImGui::Separator();
         ImGui::Spacing();
@@ -323,7 +345,7 @@ int main(int, char**) {
         if (ImGui::Button("Copy RGBA")) {
             ImGui::SetClipboardText(rgbaText);
         }
-        ImGui::SameLine();
+        
         std::string hexCpy = ColorConverter::RGBAToHex(RGBA(currentRGB.r, currentRGB.g, currentRGB.b, alphaInput));
         ImGui::Text("%s", hexCpy.c_str());
         ImGui::SameLine();
@@ -335,6 +357,44 @@ int main(int, char**) {
         ImGui::Columns(1);
 
         // Synchronization logic
+        
+        // Eyedropper sampling: get cursor pixel from the desktop (cross-platform)
+        if (eyedropperActive) {
+            int x, y;
+            PlatformUtils::GetCursorPosition(x, y);
+            
+            float r, g, b;
+            PlatformUtils::GetPixelColor(x, y, r, g, b);
+            
+            if (eyedropperLiveUpdate) {
+                currentRGB.r = r;
+                currentRGB.g = g;
+                currentRGB.b = b;
+                rgbInput[0] = currentRGB.r * 255.0f;
+                rgbInput[1] = currentRGB.g * 255.0f;
+                rgbInput[2] = currentRGB.b * 255.0f;
+                syncFromRGB = true;
+            }
+            
+            // Confirm on left-click
+            if (PlatformUtils::IsLeftMouseButtonPressed()) {
+                // Lock current sampled color and stop
+                eyedropperActive = false;
+                syncFromRGB = true;
+            }
+            
+            // Cancel on ESC
+            if (PlatformUtils::IsEscapeKeyPressed()) {
+                eyedropperActive = false;
+            }
+            
+            // Small on-screen tooltip near cursor inside app window
+            ImGui::BeginTooltip();
+            ImGui::Text("Sampling at cursor: RGB(%d,%d,%d)",
+                (int)(currentRGB.r * 255.0f), (int)(currentRGB.g * 255.0f), (int)(currentRGB.b * 255.0f));
+            ImGui::EndTooltip();
+        }
+
         if (syncFromHex) {
             currentRGBA = ColorConverter::HexToRGBA(std::string(hexInput));
             currentRGB = RGB(currentRGBA.r, currentRGBA.g, currentRGBA.b);

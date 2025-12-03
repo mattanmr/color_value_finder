@@ -23,10 +23,12 @@ add_subdirectory(external/imgui)
 set(SOURCES
     src/main.cpp
     src/ColorConverter.cpp
+    src/PlatformUtils.cpp
 )
 
 set(HEADERS
     src/ColorConverter.h
+    src/PlatformUtils.h
 )
 
 # Create executable
@@ -54,6 +56,8 @@ elseif(APPLE)
         "-framework Cocoa"
         "-framework IOKit"
         "-framework CoreVideo"
+        "-framework CoreGraphics"
+        "-framework ApplicationServices"
     )
 elseif(UNIX)
     target_link_libraries(${PROJECT_NAME} PRIVATE
