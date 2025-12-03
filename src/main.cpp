@@ -115,6 +115,7 @@ int main(int, char**) {
     RGB currentRGB = ColorConverter::HexToRGB(std::string(hexInput));
     
     float rgbInput[3] = { currentRGB.r * 255.0f, currentRGB.g * 255.0f, currentRGB.b * 255.0f };
+    float alphaInput = 1.0f;
     HSV initHSV = ColorConverter::RGBToHSV(currentRGB);
     HSL initHSL = ColorConverter::RGBToHSL(currentRGB);
     CMYK initCMYK = ColorConverter::RGBToCMYK(currentRGB);
@@ -186,6 +187,10 @@ int main(int, char**) {
             syncFromRGB = true;
         }
 
+        // Alpha slider
+        ImGui::SetNextItemWidth(300);
+        ImGui::SliderFloat("A (alpha)", &alphaInput, 0.0f, 1.0f, "%.2f");
+
         ImGui::Spacing();
         ImGui::Separator();
         ImGui::Spacing();
@@ -255,13 +260,15 @@ int main(int, char**) {
         ImGui::BeginChild("RightPanel", ImVec2(0, 0), false);
         ImGui::Text("Color Picker:");
         ImGui::Spacing();
-        float pickerColor[3] = {currentRGB.r, currentRGB.g, currentRGB.b};
-        if (ImGui::ColorPicker3("##picker", pickerColor, 
-            ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_NoAlpha | 
-            ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_DisplayHSV)) {
+        float pickerColor[4] = {currentRGB.r, currentRGB.g, currentRGB.b, alphaInput};
+        if (ImGui::ColorPicker4("##picker", pickerColor,
+            ImGuiColorEditFlags_PickerHueWheel |
+            ImGuiColorEditFlags_DisplayRGB |
+            ImGuiColorEditFlags_DisplayHSV)) {
             currentRGB.r = pickerColor[0];
             currentRGB.g = pickerColor[1];
             currentRGB.b = pickerColor[2];
+            alphaInput   = pickerColor[3];
             syncFromRGB = true;
             rgbInput[0] = currentRGB.r * 255.0f;
             rgbInput[1] = currentRGB.g * 255.0f;
@@ -281,7 +288,22 @@ int main(int, char**) {
         float rounding = ImGui::GetStyle().FrameRounding;
         ImU32 colShadow = ImGui::GetColorU32(ImVec4(0, 0, 0, 0.35f));
         ImU32 colBorder = ImGui::GetColorU32(ImVec4(0.28f, 0.32f, 0.45f, 0.8f));
-        ImU32 colFill = ImGui::GetColorU32(ImVec4(currentRGB.r, currentRGB.g, currentRGB.b, 1.0f));
+        ImU32 colFill = ImGui::GetColorU32(ImVec4(currentRGB.r, currentRGB.g, currentRGB.b, alphaInput));
+        
+        // Checkerboard background to visualize transparency
+        const float tileSize = 12.0f;
+        ImU32 colLight = ImGui::GetColorU32(ImVec4(0.75f, 0.75f, 0.75f, 1.0f));
+        ImU32 colDark  = ImGui::GetColorU32(ImVec4(0.55f, 0.55f, 0.55f, 1.0f));
+        int tilesX = (int)ceilf((pMax.x - pMin.x) / tileSize);
+        int tilesY = (int)ceilf((pMax.y - pMin.y) / tileSize);
+        for (int y = 0; y < tilesY; ++y) {
+            for (int x = 0; x < tilesX; ++x) {
+                bool isLight = ((x + y) % 2) == 0;
+                ImVec2 cMin(pMin.x + x * tileSize, pMin.y + y * tileSize);
+                ImVec2 cMax(std::min(cMin.x + tileSize, pMax.x), std::min(cMin.y + tileSize, pMax.y));
+                dl->AddRectFilled(cMin, cMax, isLight ? colLight : colDark, rounding);
+            }
+        }
         // Shadow (slight offset)
         dl->AddRectFilled(ImVec2(pMin.x + 4, pMin.y + 6), ImVec2(pMax.x + 4, pMax.y + 6), colShadow, rounding);
         // Filled rectangle with border
