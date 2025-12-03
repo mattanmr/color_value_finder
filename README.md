@@ -4,15 +4,20 @@ A cross-platform GUI application for finding and converting color values between
 
 ## Features
 
-- **Visual Color Preview**: See your selected color in real-time
+- **Visual Color Preview**: See your selected color in real-time with alpha transparency support
+- **Eyedropper Tool**: Pick colors from anywhere on your screen (Windows & macOS)
+  - Live color preview while hovering
+  - Left-click to select color
+  - Press Escape to cancel
 - **Multiple Input Methods**:
-  - HEX color codes (#RRGGBB)
-  - RGB sliders (0-255)
+  - HEX color codes (#RRGGBB and #RRGGBBAA with alpha)
+  - RGB sliders (0-255) with alpha channel
   - HSV sliders (Hue: 0-360°, Saturation & Value: 0-1)
   - HSL sliders (Hue: 0-360°, Saturation & Lightness: 0-1)
   - CMYK sliders (0-1)
   - Interactive color picker with hue wheel
 - **Real-time Conversion**: Changes in one format automatically update all others
+- **Copy to Clipboard**: Quick copy buttons for RGBA and HEX values
 - **Cross-Platform**: Runs on Windows, macOS, and Linux
 
 ## Requirements
@@ -129,13 +134,23 @@ cmake --build . --config Release
 
 1. **Launch the Application**: Run the executable built in the previous step
 2. **Select a Color**: Use any of the following methods:
-   - Type a HEX code (e.g., `#FF5733`)
+   - Type a HEX code (e.g., `#FF5733` or `#FF5733FF` with alpha)
    - Adjust RGB sliders
    - Adjust HSV sliders
    - Adjust HSL sliders
    - Adjust CMYK sliders
    - Use the interactive color picker wheel
+   - Use the Eyedropper tool to pick colors from your screen
 3. **View Conversions**: All color format values update automatically
+4. **Copy Values**: Click "Copy RGBA" or "Copy HEX" to copy color values to clipboard
+
+### Using the Eyedropper
+
+1. Click the **Start** button in the Eyedropper section
+2. Move your cursor anywhere on your screen (works outside the app window)
+3. The color under your cursor will update in real-time
+4. **Left-click** to select and lock the color
+5. Press **Escape** to cancel without selecting
 
 ## Project Structure
 
@@ -150,7 +165,9 @@ color_value_finder/
 └── src/                   # Source code
     ├── main.cpp          # Application entry point and GUI
     ├── ColorConverter.h   # Color conversion header
-    └── ColorConverter.cpp # Color conversion implementation
+    ├── ColorConverter.cpp # Color conversion implementation
+    ├── PlatformUtils.h    # Cross-platform utilities header
+    └── PlatformUtils.cpp  # Platform-specific implementations (screen capture, input)
 ```
 
 ## Technologies Used
@@ -163,13 +180,21 @@ color_value_finder/
 ## Color Conversion Details
 
 The application supports conversions between:
-- **HEX**: Hexadecimal color codes (#RRGGBB)
-- **RGB**: Red, Green, Blue (0-255)
+- **HEX**: Hexadecimal color codes (#RRGGBB or #RRGGBBAA with alpha)
+- **RGB**: Red, Green, Blue (0-255) with optional alpha (0-1)
 - **HSV**: Hue (0-360°), Saturation (0-1), Value (0-1)
 - **HSL**: Hue (0-360°), Saturation (0-1), Lightness (0-1)
 - **CMYK**: Cyan, Magenta, Yellow, Key/Black (0-1)
 
 All conversions are performed in real-time with high precision.
+
+## Platform-Specific Features
+
+### Eyedropper Implementation
+
+- **Windows**: Uses Win32 APIs (`GetCursorPos`, `GetPixel`, `GetAsyncKeyState`)
+- **macOS**: Uses Core Graphics APIs (`CGEventGetLocation`, `CGDisplayCreateImageForRect`, `CGEventSourceButtonState`)
+- **Linux**: Currently not implemented (contributions welcome!)
 
 ## License
 
