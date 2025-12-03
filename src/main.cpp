@@ -110,7 +110,7 @@ int main(int, char**) {
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
-    // Application state - initialize from requested color #4CC2CC
+    // Application state - initialize from default color #4CC2CC
     char hexInput[8] = "#4CC2CC";
     RGB currentRGB = ColorConverter::HexToRGB(std::string(hexInput));
     
@@ -144,7 +144,6 @@ int main(int, char**) {
             ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | 
             ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBringToFrontOnFocus);
 
-        ImGui::Text("Color Value Finder");
         ImGui::Separator();
         ImGui::Spacing();
 
