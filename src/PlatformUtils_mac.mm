@@ -88,27 +88,50 @@ static size_t gBytesPerRow = 0;
 @end
 
 static CVFFrameCollector *gCollector = nil;
-static std::once_flag gInitOnce;
+static std::atomic<bool> gInitialized(false);
+static std::mutex gInitMutex;
 
 static bool ensureCollector() {
-    __block bool ok = false;
-    std::call_once(gInitOnce, ^{
-        __block NSError *err = nil;
+    if (gInitialized.load()) {
+        return gCollector != nil;
+    }
+    
+    std::lock_guard<std::mutex> initLock(gInitMutex);
+    if (gInitialized.load()) {
+        return gCollector != nil;
+    }
+    
+    @autoreleasepool {
+        NSError *err = nil;
         __block SCShareableContent *content = nil;
         dispatch_semaphore_t sem = dispatch_semaphore_create(0);
         [SCShareableContent getShareableContentWithCompletionHandler:^(SCShareableContent * _Nullable c, NSError * _Nullable e){
-            content = c; err = e; dispatch_semaphore_signal(sem);
+            content = c;
+            dispatch_semaphore_signal(sem);
         }];
-        // Wait up to 1s
-        dispatch_time_t timeout = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC));
-        dispatch_semaphore_wait(sem, timeout);
-        if (!content || content.displays.count == 0) { gCollector = nil; return; }
+        
+        dispatch_time_t timeout = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC));
+        if (dispatch_semaphore_wait(sem, timeout) != 0) {
+            gInitialized.store(true);
+            return false; // timeout
+        }
+        
+        if (!content || content.displays.count == 0) {
+            gInitialized.store(true);
+            return false;
+        }
+        
         SCDisplay *disp = content.displays.firstObject;
         gCollector = [[CVFFrameCollector alloc] initWithDisplay:disp];
-        ok = [gCollector start:&err];
-        if (!ok) gCollector = nil;
-    });
-    return gCollector != nil;
+        
+        BOOL started = [gCollector start:&err];
+        if (!started) {
+            gCollector = nil;
+        }
+        
+        gInitialized.store(true);
+        return gCollector != nil;
+    }
 }
 
 namespace PlatformUtils {
