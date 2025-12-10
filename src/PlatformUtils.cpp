@@ -36,55 +36,22 @@ namespace PlatformUtils {
 }
 
 #elif defined(__APPLE__)
-#include <ApplicationServices/ApplicationServices.h>
-#include <CoreGraphics/CoreGraphics.h>
-
+// macOS: Eyedropper feature not yet implemented
 namespace PlatformUtils {
     void GetCursorPosition(int& x, int& y) {
-        CGEventRef event = CGEventCreate(NULL);
-        CGPoint cursor = CGEventGetLocation(event);
-        CFRelease(event);
-        x = static_cast<int>(cursor.x);
-        y = static_cast<int>(cursor.y);
+        x = y = 0;
     }
     
     void GetPixelColor(int x, int y, float& r, float& g, float& b) {
-        // Create a 1x1 pixel image at the cursor location
-        CGImageRef image = CGDisplayCreateImageForRect(CGMainDisplayID(), CGRectMake(x, y, 1, 1));
-        
-        if (image) {
-            // Get pixel data
-            CFDataRef data = CGDataProviderCopyData(CGImageGetDataProvider(image));
-            const uint8_t* pixels = CFDataGetBytePtr(data);
-            
-            // macOS typically uses BGRA or RGBA format
-            // Check bytes per pixel to determine format
-            size_t bitsPerPixel = CGImageGetBitsPerPixel(image);
-            size_t bytesPerPixel = bitsPerPixel / 8;
-            
-            if (bytesPerPixel >= 3) {
-                // Assume BGRA or RGBA - most common on macOS
-                r = pixels[0] / 255.0f;
-                g = pixels[1] / 255.0f;
-                b = pixels[2] / 255.0f;
-            } else {
-                r = g = b = 0.0f;
-            }
-            
-            CFRelease(data);
-            CGImageRelease(image);
-        } else {
-            r = g = b = 0.0f;
-        }
+        r = g = b = 0.0f;
     }
     
     bool IsLeftMouseButtonPressed() {
-        return CGEventSourceButtonState(kCGEventSourceStateHIDSystemState, kCGMouseButtonLeft);
+        return false;
     }
     
     bool IsEscapeKeyPressed() {
-        // Check for Escape key (keycode 53 on macOS)
-        return CGEventSourceKeyState(kCGEventSourceStateHIDSystemState, 53);
+        return false;
     }
 }
 
