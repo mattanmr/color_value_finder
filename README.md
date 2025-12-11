@@ -2,20 +2,20 @@
 
 A sleek, cross-platform GUI application for converting and analyzing color values across multiple formats. Built with C++, Dear ImGui, and GLFW.
 
-**[🔗 Download Latest Release](https://github.com/mattanmr/color_value_finder/releases)** • **[📖 Documentation](#building-from-source)** • **[🐛 Report Issues](https://github.com/mattanmr/color_value_finder/issues)**
+**[Download Latest Release](https://github.com/mattanmr/color_value_finder/releases)** • **[Documentation](#building-from-source)** • **[Report Issues](https://github.com/mattanmr/color_value_finder/issues)**
 
-## ✨ Features
+## Features
 
-- 🎨 **Multi-Format Color Converter**: Seamlessly convert between HEX, RGB, HSV, HSL, and CMYK
-- 🌈 **Interactive Color Picker**: Visual hue wheel with real-time preview
-- 📋 **One-Click Copy**: Copy RGBA and HEX values instantly
-- 🖱️ **Eyedropper Tool**: Pick colors directly from your screen (Windows)
-- 👁️ **Transparency Support**: Visual checkerboard preview for alpha channel
-- 🎯 **Modern UI**: Dark-themed interface with smooth interactions
-- ⚡ **Real-time Sync**: Changes in any format instantly update all others
-- 🌍 **Cross-Platform**: Windows, macOS, and Linux support
+- **Multi-Format Color Converter**: Seamlessly convert between HEX, RGB, HSV, HSL, and CMYK
+- **Interactive Color Picker**: Visual hue wheel with real-time preview
+- **One-Click Copy**: Copy RGBA and HEX values instantly
+- **Eyedropper Tool**: Pick colors directly from your screen (Windows)
+- **Transparency Support**: Visual checkerboard preview for alpha channel
+- **Modern UI**: Dark-themed interface with smooth interactions
+- **Real-time Sync**: Changes in any format instantly update all others
+- **Cross-Platform**: Windows, macOS, and Linux support
 
-## 📥 Quick Start
+## Quick Start
 
 ### Download Pre-built Binary
 
@@ -67,7 +67,7 @@ cmake --build . --config Release
 ./bin/ColorValueFinder
 ```
 
-## 🎮 Usage
+## Usage
 
 1. **Enter a color** using any method:
    - Type HEX codes: `#FF5733` or `#FF5733FF` (with alpha)
@@ -81,9 +81,7 @@ cmake --build . --config Release
    - `Copy RGBA`: Paste as `rgba(255, 87, 51, 1.0)`
    - `Copy HEX`: Paste as `#FF5733FF`
 
-## 📋 Supported Color Formats
-
-## 📋 Supported Color Formats
+## Supported Color Formats
 
 | Format | Range | Example |
 |--------|-------|---------|
@@ -93,7 +91,7 @@ cmake --build . --config Release
 | **HSL** | H: 0-360°, S/L: 0-1 | hsl(9°, 1.00, 0.60) |
 | **CMYK** | 0-1 per channel | cmyk(0.00, 0.66, 0.80, 0.00) |
 
-## 📋 Project Structure
+## Project Structure
 
 ```
 color_value_finder/
@@ -115,14 +113,14 @@ color_value_finder/
     └── PlatformUtils.h/.cpp   # Platform-specific utilities
 ```
 
-## 🔧 Technologies
+## Technologies
 
 - **[Dear ImGui](https://github.com/ocornut/imgui)**: Immediate-mode GUI framework
 - **[GLFW](https://www.glfw.org/)**: Window and input management
 - **OpenGL 3.3+**: Graphics rendering
 - **CMake**: Build system
 
-## 📦 Requirements
+## Requirements
 
 ### All Platforms
 - CMake 3.15 or higher
@@ -153,7 +151,7 @@ sudo dnf install gcc-c++ cmake mesa-libGL-devel libXrandr-devel libXinerama-deve
 sudo pacman -S base-devel cmake mesa libxrandr libxinerama libxcursor libxi
 ```
 
-## 🏗️ Building from Source
+## Building from Source
 
 Detailed build instructions for each platform are available in `releases/v0.1.2/BUILD_INSTRUCTIONS.md`.
 
@@ -169,7 +167,7 @@ cmake --build . --config Release
 
 Output binary: `./bin/ColorValueFinder` (or `.exe` on Windows)
 
-## 🚀 Platform-Specific Notes
+## Platform-Specific Notes
 
 ### Windows
 - Eyedropper tool fully functional
@@ -187,7 +185,7 @@ Output binary: `./bin/ColorValueFinder` (or `.exe` on Windows)
 - Run: `chmod +x ColorValueFinder && ./ColorValueFinder`
 - Eyedropper not yet implemented (contributions welcome!)
 
-## ❓ Troubleshooting
+## Troubleshooting
 
 **"Cannot open" / "Unknown developer" (macOS)**
 ```bash
@@ -208,11 +206,11 @@ xattr -d com.apple.quarantine ColorValueFinder
 - Linux: `sudo apt install g++` (Ubuntu) or `sudo dnf install gcc-c++` (Fedora)
 - Windows: Install Visual Studio 2019 or later
 
-## 📝 License
+## License
 
 This project is licensed under the MIT License - see [LICENSE.md](LICENSE.md) for details.
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please feel free to:
 - [Report bugs](https://github.com/mattanmr/color_value_finder/issues)
@@ -224,10 +222,10 @@ Contributions are welcome! Please feel free to:
 - CMYK conversion: Some edge cases need refinement
 - Planned: Color history, favorites, palettes, gradient editor
 
-## 💝 Credits
+## Credits
 
-Created with ❤️ for designers, developers, and color enthusiasts.
+Created with ❤️ for designers and developers.
 
 ---
 
-**[Download Now](https://github.com/mattanmr/color_value_finder/releases)** • **[Report Issue](https://github.com/mattanmr/color_value_finder/issues)** • **[View Changelog](CHANGELOG.md)**
+**[Download Now](https://github.com/mattanmr/color_value_finder/releases)** • **[Report Issue](https://github.com/mattanmr/color_value_finder/issues)**
