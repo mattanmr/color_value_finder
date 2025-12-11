@@ -1,15 +1,27 @@
 changelog:
   exclude:
-    labels: [ignore-for-release, skip-changelog]
-    authors: [dependabot, dependabot[bot]]
+    labels:
+      - ignore-for-release
+      - skip-changelog
+    authors:
+      - dependabot
+      - dependabot[bot]
   categories:
     - title: Breaking Changes 🛠
-      labels: [breaking]
+      labels:
+        - breaking
     - title: Features ✨
-      labels: [enhancement, feature]
+      labels:
+        - enhancement
+        - feature
     - title: Bug Fixes 🐛
-      labels: [bug, bugfix]
+      labels:
+        - bug
+        - bugfix
     - title: Documentation 📖
-      labels: [documentation, docs]
+      labels:
+        - documentation
+        - docs
     - title: Other Changes
-      labels: ['*']
+      labels:
+        - "*"
