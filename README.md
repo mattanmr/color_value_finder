@@ -5,7 +5,7 @@ A cross-platform GUI application for finding and converting color values between
 ## Features
 
 - **Visual Color Preview**: See your selected color in real-time with alpha transparency support
-- **Eyedropper Tool**: Pick colors from anywhere on your screen (Windows & macOS)
+- **Eyedropper Tool**: Pick colors from anywhere on your screen (Windows only)
   - Live color preview while hovering
   - Left-click to select color
   - Press Escape to cancel
@@ -146,7 +146,7 @@ cmake --build . --config Release
 
 ### Using the Eyedropper
 
-1. Click the **Start** button in the Eyedropper section
+1. Click the **Start** button in the Eyedropper section (Windows only)
 2. Move your cursor anywhere on your screen (works outside the app window)
 3. The color under your cursor will update in real-time
 4. **Escape** to select the color and stop updating
@@ -191,8 +191,8 @@ All conversions are performed in real-time with high precision.
 
 ### Eyedropper Implementation
 
-- **Windows**: Uses Win32 APIs (`GetCursorPos`, `GetPixel`, `GetAsyncKeyState`)
-- **macOS**: Uses Core Graphics APIs (`CGEventGetLocation`, `CGDisplayCreateImageForRect`, `CGEventSourceButtonState`)
+- **Windows**: Fully implemented using Win32 APIs (`GetCursorPos`, `GetPixel`, `GetAsyncKeyState`)
+- **macOS**: Currently not implemented (contributions welcome!)
 - **Linux**: Currently not implemented (contributions welcome!)
 
 ## License
