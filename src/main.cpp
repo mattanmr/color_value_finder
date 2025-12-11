@@ -280,7 +280,7 @@ int main(int, char**) {
             rgbInput[1] = currentRGB.g * 255.0f;
             rgbInput[2] = currentRGB.b * 255.0f;
         }
-
+        #ifdef _WIN32
         // Eyedropper controls (pick colors from anywhere on screen)
         ImGui::Separator();
         ImGui::Spacing();
@@ -297,6 +297,7 @@ int main(int, char**) {
             ImGui::SameLine();
             ImGui::Text("Press Esc to stop");
         }
+        #endif
         ImGui::Spacing();
         ImGui::Separator();
         ImGui::Spacing();
