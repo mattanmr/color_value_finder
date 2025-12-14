@@ -23,8 +23,12 @@ releases/*.tar.gz
 
 # Executables
 *.exe
+!releases/**/*.exe
 *.out
 *.app
+
+# archive files
+*.zip
 
 # CMake
 CMakeCache.txt
